@@ -6,57 +6,55 @@ type Locations = {
   seconds: number[];
 };
 
-export function day1part1(filename: string): number {
-  const locations = fs
+export function part1(filename: string): number {
+  const lines = fs
     .readFileSync(path.join(__dirname, filename))
     .toString()
-    .split("\n")
-    .reduce(
-      (loc: Locations, line) => {
-        const [firstStr, secondStr] = line.split(/\s+/);
-        return {
-          firsts: [...loc.firsts, parseInt(firstStr)],
-          seconds: [...loc.seconds, parseInt(secondStr)],
-        };
-      },
-      { firsts: [], seconds: [] }
-    );
+    .split("\n");
 
-  locations.firsts.sort((a, b) => a - b);
-  locations.seconds.sort((a, b) => a - b);
+  const firstList: number[] = [];
+  const secondList: number[] = [];
 
-  return locations.firsts.reduce(
-    (total, firstValue, i) =>
-      total + Math.abs(firstValue - locations.seconds[i]),
-    0
-  );
+  for (const line of lines) {
+    const [first, second] = line.split(/\s+/).map((ch) => parseInt(ch));
+    firstList.push(first);
+    secondList.push(second);
+  }
+
+  firstList.sort((a, b) => a - b);
+  secondList.sort((a, b) => a - b);
+
+  let distance = 0;
+  for (let i = 0; i < firstList.length; i++) {
+    distance += Math.abs(firstList[i] - secondList[i]);
+  }
+
+  return distance;
 }
 
-type Similarities = {
-  firsts: number[];
-  secondCounts: { [key: number]: number };
-};
-
-export function day1part2(filename: string): number {
-  const { firsts, secondCounts } = fs
+export function part2(filename: string) {
+  const lines = fs
     .readFileSync(path.join(__dirname, filename))
     .toString()
-    .split("\n")
-    .reduce(
-      (sim: Similarities, line) => {
-        const [first, second] = line.split(/\s+/).map((ch) => parseInt(ch));
-        return {
-          firsts: [...sim.firsts, first],
-          secondCounts: sim.secondCounts[second]
-            ? { ...sim.secondCounts, [second]: sim.secondCounts[second] + 1 }
-            : { ...sim.secondCounts, [second]: 1 },
-        };
-      },
-      { firsts: [], secondCounts: {} }
-    );
+    .split("\n");
 
-  return firsts.reduce(
-    (total, first) => total + first * (secondCounts[first] ?? 0),
-    0
-  );
+  const firstList: number[] = [];
+  const secondCounts: { [key: number]: number } = {};
+
+  for (const line of lines) {
+    const [first, second] = line.split(/\s+/).map((ch) => parseInt(ch));
+    firstList.push(first);
+    if (secondCounts[second]) {
+      secondCounts[second]++;
+    } else {
+      secondCounts[second] = 1;
+    }
+  }
+
+  let similarity = 0;
+  for (const first of firstList) {
+    similarity += first * (secondCounts[first] ?? 0);
+  }
+
+  return similarity;
 }
