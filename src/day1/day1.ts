@@ -1,11 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-type Locations = {
-  firsts: number[];
-  seconds: number[];
-};
-
 export function part1(filename: string): number {
   const lines = fs
     .readFileSync(path.join(__dirname, filename))
