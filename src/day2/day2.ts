@@ -109,3 +109,85 @@ export function part2(filename: string) {
 
   return safeCount;
 }
+
+export function p2(filename: string) {
+  const reports = fs
+    .readFileSync(path.join(__dirname, filename))
+    .toString()
+    .split("\n")
+    .map((line) => line.split(" ").map((ch) => parseInt(ch)));
+
+  let unsafeReports: { [key: number]: number[][] } = {};
+  let safeCount = 0;
+
+  for (let i = 0; i < reports.length; i++) {
+    let report = reports[i];
+    let safe = true;
+    const isAsc = report[0] < report[1];
+
+    for (let j = 0; j < report.length - 1; j++) {
+      if (!isSafe(report[j], report[j + 1], isAsc)) {
+        safe = false;
+        let unsafeLeft = [...report];
+        let unsafeRight = [...report];
+        unsafeLeft.splice(j, 1);
+        unsafeRight.splice(j + 1, 1);
+        unsafeReports[i] = [unsafeLeft, unsafeRight];
+        break;
+      }
+    }
+
+    if (safe) {
+      safeCount++;
+    }
+  }
+
+  console.log(safeCount);
+  console.log(Object.values(unsafeReports).flat().length);
+
+  for (let [key, [try1, try2]] of Object.entries(unsafeReports)) {
+    let safe = true;
+    for (let i = 0; i < try1.length - 1; i++) {
+      const isAsc = try1[0] < try1[1];
+      if (!isSafe(try1[i], try1[i+1], isAsc)) {
+        safe = false;
+        break;
+      }
+    }
+    if (safe) {
+      safeCount++;
+    } else {
+      safe = true;
+      for (let i = 0; i < try2.length - 1; i++) {
+        const isAsc = try2[0] < try2[1];
+        if (!isSafe(try2[i], try2[i + 1], isAsc)) {
+          safe = false;
+          break;
+        }
+      }
+      if (safe) {
+        safeCount++;
+      }
+    }
+  }
+
+  console.log(safeCount);
+}
+
+function isSafe(left: number, right: number, isAsc: boolean): boolean {
+  if (left === right) {
+    return false;
+  }
+
+  const isPairAsc = left < right;
+  if ((isAsc && !isPairAsc) || (!isAsc && isPairAsc)) {
+    return false;
+  }
+
+  const diff = Math.abs(left - right);
+  if (diff < 1 || diff > 3) {
+    return false;
+  }
+
+  return true;
+}

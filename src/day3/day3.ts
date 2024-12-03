@@ -1,24 +1,22 @@
 import fs from "fs";
 import path from "path";
 
-const mulExpression = new RegExp(/mul\(\d+,\d+\)/g);
+const mulExpression = /mul\(\d+,\d+\)/g;
 
 export function part1(filename: string) {
-  const input = fs
+  let input = fs
     .readFileSync(path.join(__dirname, filename))
     .toString()
-    .split("\n");
+    .replace("\n", "");
 
   let result = 0;
-  for (let line of input) {
-    const matches = line.match(mulExpression);
-    if (matches !== null) {
-      for (let match of matches) {
-        const numberMatches = match.match(/mul\((\d+),(\d+)\)/);
-        const left = parseInt(numberMatches![1]);
-        const right = parseInt(numberMatches![2]);
-        result += left * right;
-      }
+  const matches = input.match(mulExpression);
+  if (matches !== null) {
+    for (let exp of matches) {
+      const numberMatches = exp.match(/mul\((\d+),(\d+)\)/);
+      const left = parseInt(numberMatches![1]);
+      const right = parseInt(numberMatches![2]);
+      result += left * right;
     }
   }
 
@@ -39,13 +37,13 @@ export function part2(filename: string) {
   while (true) {
     if (isDo) {
       const terminator = input.indexOf(DONT);
-      const toParse = terminator > 0 ? input.slice(0, terminator) : input;
-      const matches = toParse.match(mulExpression);
+      const toMatch = terminator > 0 ? input.slice(0, terminator) : input;
+      const matches = toMatch.match(mulExpression);
       if (matches !== null) {
         for (let match of matches) {
-          const numberMatches = match.match(/mul\((\d+),(\d+)\)/);
-          const left = parseInt(numberMatches![1]);
-          const right = parseInt(numberMatches![2]);
+          const numberCaptures = match.match(/mul\((\d+),(\d+)\)/);
+          const left = parseInt(numberCaptures![1]);
+          const right = parseInt(numberCaptures![2]);
           result += left * right;
         }
 
